@@ -4,3 +4,5 @@ config.json
 portfolio.json
 plan.json
 *.out.json
+web/data/
+.nepse-cache/

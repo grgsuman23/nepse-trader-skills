@@ -6,6 +6,33 @@ This project is separate from Nepse-Screener: it shares no code and changes noth
 
 > **Read [docs/ACCURACY.md](docs/ACCURACY.md) first.** On 2016–2026 data, after costs, three of the four setups lost money. Only `high52` (a new 52-week high) had a positive average, and in 2023–26 it was within one standard error of zero. This is a tool for testing ideas and enforcing discipline, not a money machine.
 
+## Web app
+
+**https://grgsuman23.github.io/nepse-trader-skills/**
+
+The web app has six tabs:
+
+| Tab | What it shows |
+|---|---|
+| Today | Market summary and the setups that fired on the last close |
+| Plan a trade | Exit plan, size, risk gate, time-machine odds and the TMS ticket for any stock |
+| Stocks | A filterable list of all equities |
+| Accuracy | The backtest results |
+| Fees | Trade cost calculator |
+| My settings | Your budget, limits and holdings |
+
+Your budget and holdings are saved only in your own browser.
+
+A GitHub Action (`.github/workflows/pages.yml`) runs every day at 05:05 NPT. It downloads the latest data, runs all the tests (including checks that the browser engine `web/engine.js` matches the Python skills), rebuilds `web/data/` and deploys the site to GitHub Pages. You can also start it by hand from the Actions tab, using **Run workflow**.
+
+To preview locally:
+
+```bash
+python nepse-update/update.py
+python tools/build_web_data.py
+cd web && python -m http.server 8000   # open http://localhost:8000
+```
+
 ## The eight skills
 
 | Skill | What it does |

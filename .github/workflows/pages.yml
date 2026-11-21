@@ -1,0 +1,53 @@
+name: Build and deploy web app
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 23:20 UTC = 05:05 NPT, after the source datasets update each evening
+    - cron: "20 23 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEPSE_DATA_DIR: ${{ github.workspace }}/.nepse-cache/nepse-data/data/company-wise
+      NEPSE_INDEX_CSV: ${{ github.workspace }}/.nepse-cache/NEPSE-Data/data/market/indices/NEPSE_Index.csv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Download NEPSE data
+        run: python nepse-update/update.py --base "$GITHUB_WORKSPACE/.nepse-cache"
+      - name: Run tests (engine + web parity)
+        run: python -m unittest discover tests -v
+      - name: Build web data
+        run: python tools/build_web_data.py --out web/data
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

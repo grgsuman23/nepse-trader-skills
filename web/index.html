@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c4da1">
+<title>NEPSE Trader</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c4da1'/%3E%3Cpath d='M6 22l6-7 5 4 9-11' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='26' cy='8' r='3' fill='%23ed1b24'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>NEPSE Trader</h1>
+    <span id="tag" class="tag">…</span>
+    <span id="asof" class="asof">Loading data…</span>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-view="today" aria-selected="true">Today</button>
+    <button role="tab" data-view="plan">Plan a trade</button>
+    <button role="tab" data-view="stocks">Stocks</button>
+    <button role="tab" data-view="accuracy">Accuracy</button>
+    <button role="tab" data-view="fees">Fees</button>
+    <button role="tab" data-view="settings">My settings</button>
+  </nav>
+</header>
+
+<main>
+  <!-- TODAY -->
+  <section class="view on" id="v-today">
+    <div class="card">
+      <div class="stats" id="mkt"></div>
+      <div class="chart" id="idx-chart" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="row"><h2>Setups on the last close</h2><span class="spacer"></span>
+        <select id="hit-filter" style="width:auto"><option value="">All setups</option></select></div>
+      <p class="muted">Each hit shows that stock's own past record for the setup. Tap a row to plan it.</p>
+      <div id="hits" class="hits"></div>
+    </div>
+    <div class="note">Across NEPSE in 2016–2026, after costs, three of these four setups lost money. Only <b>high52</b> averaged a profit, and in 2023–26 that was near zero. A hit is a candidate to check, not a buy signal. See <a href="#" data-goto="accuracy">Accuracy</a>.</div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="view" id="v-plan">
+    <div class="card">
+      <h2>1 · Exit plan</h2>
+      <div class="form">
+        <div><label for="p-sym">Stock</label><input id="p-sym" list="sym-list" placeholder="e.g. NABIL" autocomplete="off"></div>
+        <div><label for="p-setup">Setup</label><select id="p-setup"></select></div>
+        <div><label for="p-entry">Entry (blank = last close)</label><input id="p-entry" type="number" step="0.1" inputmode="decimal"></div>
+        <div><label for="p-stop">Stop rule</label>
+          <select id="p-stop"><option value="atr">ATR (setup default)</option><option value="swing">Below 10-day low</option><option value="pct">% below entry</option><option value="price">Fixed price</option></select></div>
+        <div><label for="p-stopv">Stop % / price</label><input id="p-stopv" type="number" step="0.1" inputmode="decimal" disabled></div>
+        <div><label for="p-tgt">Target</label>
+          <select id="p-tgt"><option value="">Setup default</option><option value="r">Multiple of risk (R)</option><option value="price">Fixed price</option></select></div>
+        <div><label for="p-tgtv">R / price</label><input id="p-tgtv" type="number" step="0.1" inputmode="decimal" disabled></div>
+      </div>
+      <datalist id="sym-list"></datalist>
+      <div id="p-error" class="note" style="display:none;margin-top:10px"></div>
+    </div>
+    <div id="p-out" style="display:none">
+      <div class="card">
+        <div class="row"><h2 id="p-title"></h2><span class="spacer"></span><span id="p-sector" class="pill"></span></div>
+        <div class="chart" id="p-chart"></div>
+        <div class="stats" id="p-levels" style="margin-top:10px"></div>
+        <ul class="checks" id="p-warn"></ul>
+      </div>
+      <div class="grid two">
+        <div class="card"><h2>2 · Size &amp; costs</h2><div id="p-size"></div></div>
+        <div class="card"><h2>3 · Risk gate</h2><div id="p-gate"></div></div>
+      </div>
+      <div class="card"><h2>4 · Time machine</h2><div id="p-tm"></div></div>
+      <div class="card"><h2>5 · TMS ticket</h2><div id="p-ticket"></div></div>
+    </div>
+  </section>
+
+  <!-- STOCKS -->
+  <section class="view" id="v-stocks">
+    <div class="card">
+      <div class="form">
+        <div><label for="s-q">Search</label><input id="s-q" placeholder="Symbol"></div>
+        <div><label for="s-sec">Sector</label><select id="s-sec"><option value="">All sectors</option></select></div>
+        <div><label for="s-liq">Liquidity</label><select id="s-liq"><option value="1">Liquid only (≥ Rs 50 lakh/day)</option><option value="">All</option></select></div>
+      </div>
+    </div>
+    <div class="card"><div class="scroll tall"><table id="stocks"></table></div></div>
+  </section>
+
+  <!-- ACCURACY -->
+  <section class="view" id="v-accuracy">
+    <div class="card">
+      <h2>How accurate has each setup been?</h2>
+      <p class="muted" id="bt-meta"></p>
+      <div id="bt"></div>
+      <p class="muted">"Edge" is the setup's average minus the average for random entries on the same stocks with the same exits. Random entries lose roughly the round-trip cost, so a setup has to clear that before it can make money. An edge is real only if it holds in both periods and is larger than about 2 standard errors (SE).</p>
+    </div>
+    <div class="card"><h2>By year (average net % per trade)</h2><div class="scroll"><table id="bt-year"></table></div></div>
+    <div class="card"><h2>Time machine calibration</h2><div id="calib"></div></div>
+    <div class="card"><h2>Known limits</h2>
+      <ul class="muted" style="margin:0;padding-left:18px">
+        <li>Survivorship bias: the data covers only companies listed today, so delisted and merged names are missing.</li>
+        <li>Prices are adjusted for bonus and rights issues using NEPSE's base-price reset.</li>
+        <li>No slippage is modelled beyond filling gaps at the open.</li>
+        <li>Fees and CGT are as of 21 Nov 2026 and changed twice in 2026.</li>
+      </ul></div>
+  </section>
+
+  <!-- FEES -->
+  <section class="view" id="v-fees">
+    <div class="card">
+      <h2>Trade cost calculator</h2>
+      <div class="form">
+        <div><label for="f-n">Shares</label><input id="f-n" type="number" value="1000" step="10" inputmode="numeric"></div>
+        <div><label for="f-b">Buy price</label><input id="f-b" type="number" value="450" step="0.1" inputmode="decimal"></div>
+        <div><label for="f-s">Sell price</label><input id="f-s" type="number" value="560" step="0.1" inputmode="decimal"></div>
+        <div><label for="f-d">Days held</label><input id="f-d" type="number" value="100" inputmode="numeric"></div>
+      </div>
+      <div id="f-out" style="margin-top:12px"></div>
+    </div>
+    <div class="card"><h2>Rates used</h2><div id="f-rates"></div></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="v-settings">
+    <div class="card">
+      <h2>Budget &amp; limits</h2>
+      <p class="muted">These are saved in this browser only and are never uploaded.</p>
+      <div class="form" id="set-form"></div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="set-save">Save</button><button class="btn ghost" id="set-reset">Reset to defaults</button><span id="set-msg" class="muted"></span></div>
+    </div>
+    <div class="card">
+      <h2>My holdings</h2>
+      <p class="muted">These count toward cash, sector and duplicate checks. They are saved in this browser only.</p>
+      <div class="form">
+        <div><label for="h-sym">Symbol</label><input id="h-sym" list="sym-list"></div>
+        <div><label for="h-qty">Qty</label><input id="h-qty" type="number" step="10" inputmode="numeric"></div>
+        <div><label for="h-cost">Avg cost</label><input id="h-cost" type="number" step="0.1" inputmode="decimal"></div>
+        <div style="align-self:end"><button class="btn" id="h-add">Add</button></div>
+      </div>
+      <div class="scroll" style="margin-top:12px"><table id="h-table"></table></div>
+    </div>
+  </section>
+</main>
+<footer id="foot"></footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
