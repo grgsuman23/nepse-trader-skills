@@ -1,0 +1,8 @@
+{
+  "name": "nepse-trader-skills",
+  "description": "Eight Claude skills for NEPSE swing trading: data update, scanner, exit planner, NPR budget with real fee slabs and CGT, risk gate, manual TMS ticket, time machine and an accuracy backtest. Never places orders.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "keywords": ["claude-skills", "nepse", "nepal", "stock-market", "backtesting", "risk-management"],
+  "skills": "./"
+}

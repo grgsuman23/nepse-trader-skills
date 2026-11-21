@@ -1,0 +1,20 @@
+{
+  "budget_npr": 500000,
+  "cash_buffer_pct": 5,
+  "max_position_pct": 20,
+  "max_sector_pct": 40,
+  "max_loss_per_trade_npr": 5000,
+  "min_reward_risk": 1.5,
+  "min_avg_turnover_npr": 5000000,
+  "max_pct_of_turnover": 10,
+  "earliest_sell_session": 2,
+  "investor_type": "individual",
+  "fees": {
+    "commission_slabs": [[50000, 0.36], [500000, 0.33], [2000000, 0.31], [10000000, 0.27], [null, 0.24]],
+    "min_commission_npr": 10.0,
+    "sebon_fee_pct": 0.015,
+    "dp_charge_npr": 25.0,
+    "cgt_short_pct": 5.0,
+    "cgt_long_pct": 3.75
+  }
+}

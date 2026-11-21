@@ -1,0 +1,7 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "nepse-trader-skills",
+  "description": "NEPSE swing-trading skills with an honest accuracy backtest",
+  "owner": {"name": "Suman"},
+  "plugins": [{"name": "nepse-trader-skills", "description": "NEPSE scanner, exit planner, NPR budget, risk gate, TMS ticket, time machine and backtest.", "source": "./", "category": "productivity"}]
+}
